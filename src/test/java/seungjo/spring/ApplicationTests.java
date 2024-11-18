@@ -1,4 +1,4 @@
-package f1v3.spring;
+package seungjo.spring;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
