@@ -1,10 +1,10 @@
-package seungjo.spring;
+package seungjo.hello;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApplicationTests {
+class HelloApplicationTest {
 
     @Test
     void contextLoads() {
