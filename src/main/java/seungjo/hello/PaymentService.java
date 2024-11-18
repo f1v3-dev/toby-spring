@@ -14,8 +14,14 @@ import java.util.stream.Collectors;
 public class PaymentService {
 
     public Payment prepare(Long oderId, String currency, BigDecimal foreignCurrencyAmount) throws IOException {
+        BigDecimal exRate = getExRate(currency);
+        BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
+        LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
 
-        // todo 1. 환율 가져오기
+        return new Payment(oderId, currency, foreignCurrencyAmount, exRate, convertedAmount, validUntil);
+    }
+
+    private BigDecimal getExRate(String currency) throws IOException {
         URL url = new URL("https://open.er-api.com/v6/latest/" + currency);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -23,19 +29,9 @@ public class PaymentService {
         String response = br.lines().collect(Collectors.joining());
         br.close();
 
-        // 우리가 필요한 정보(관심사)만 빼오자.
         ObjectMapper mapper = new ObjectMapper();
         ExRateData data = mapper.readValue(response, ExRateData.class);
-        BigDecimal exRate = data.rates().get("KRW");
-
-
-        // todo 2. 금액 계산
-        BigDecimal convertedAmount = foreignCurrencyAmount.multiply(exRate);
-
-        // todo 3. 유효 시간 계산
-        LocalDateTime validUntil = LocalDateTime.now().plusMinutes(30);
-
-        return new Payment(oderId, currency, foreignCurrencyAmount, exRate, convertedAmount, validUntil);
+        return data.rates().get("KRW");
     }
 
     public static void main(String[] args) throws IOException {
